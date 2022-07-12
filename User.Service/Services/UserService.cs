@@ -12,14 +12,17 @@ namespace User.Service.Services
     public class UserService : IUserService
     {
         private readonly IUserRepository UserRepository;
+        private readonly IUserTokenRepository UserTokenRepository;
 
         public UserService(
-          IUserRepository userRepo)
+          IUserRepository userRepo, 
+          IUserTokenRepository userTokenRepository)
         {
             UserRepository = userRepo;
+            UserTokenRepository = userTokenRepository;
         }
 
-        public Task<PageResult<UserDto>> GetAll(string select, string search, string filterAnd, string filterOr, string filterOut, string orderBy, string direction, int page, int pageSize)
+        public Task<PageResultDto<UserDto>> GetAll(string select, string search, string filterAnd, string filterOr, string filterOut, string orderBy, string direction, int page, int pageSize)
         {
             Dictionary<string, string> filterFields = new Dictionary<string, string>()
             {
@@ -60,7 +63,12 @@ namespace User.Service.Services
 
         public Task<int> Delete(UserModel user)
         {
-            return UserRepository.Delete(user);
+            var deleteUser = UserRepository.Delete(user);
+            if(deleteUser != null)
+            {
+                UserTokenRepository.DeleteByUserId(user.Id);
+            }
+            return deleteUser;
         }
 
     }

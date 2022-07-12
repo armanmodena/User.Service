@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.Mvc;
+using User.Service.DTO;
 
 namespace User.Service.Controllers
 {
@@ -19,36 +20,24 @@ namespace User.Service.Controllers
             return StatusCode(code, error);
         }
 
-        public class ResponseData
-        {
-
-            public int Status { get; set; }
-
-            [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-            public string Message { get; set; }
-
-            [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-            public object? Data { get; set; }
-        }
-
         protected ObjectResult HttpResponse(int code = 200, string message = "", object data = null)
         {
-            var response = new ResponseData
+            var response = new ResponseDataDto
             {
                 Status = code,
                 Message = message,
                 Data = data
             };
-            return StatusCode(200, response);
+            return StatusCode(code, response);
         }
         protected ObjectResult HttpResponse(int code = 200, object data = null)
         {
-            var response = new ResponseData
+            var response = new ResponseDataDto
             {
                 Status = code,
                 Data = data
             };
-            return StatusCode(200, response);
+            return StatusCode(code, response);
 
         }
     }

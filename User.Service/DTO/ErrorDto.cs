@@ -1,10 +1,10 @@
 ﻿using System;
 
-namespace User.Service.DTO.Error
+namespace User.Service.DTO
 {
 
     [Serializable]
-    public class Error
+    public class ErrorDto
     {
         public string code { get; set; } = null;
 

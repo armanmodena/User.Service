@@ -21,5 +21,11 @@ namespace User.Service.Repositories
         {
             return await DB.QueryFirstOrDefaultAsync<UserToken>("select * from user_token where user_id=@user_id and refresh_token=@refresh_token", new { user_id, refresh_token });
         }
+
+        public async Task<UserToken> DeleteByUserId(int user_id)
+        {
+            return await DB.QueryFirstOrDefaultAsync<UserToken>("delete from user_token where user_id=@user_id", new { user_id });
+
+        }
     }
 }

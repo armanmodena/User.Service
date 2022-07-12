@@ -4,7 +4,7 @@ using System.Collections.Generic;
 namespace User.Service.DTO
 {
     [Serializable]
-    public class PageResult<T>
+    public class PageResultDto<T>
     {
         public int Page { get; set; }
 
@@ -16,12 +16,12 @@ namespace User.Service.DTO
 
         public IEnumerable<T> Data { get; set; }
 
-        public PageResult()
+        public PageResultDto()
         {
 
         }
 
-        public PageResult(int page, int pageSize, int totalPage, long totalCount, IEnumerable<T> data)
+        public PageResultDto(int page, int pageSize, int totalPage, long totalCount, IEnumerable<T> data)
         {
             Page = page;
             PageSize = pageSize;

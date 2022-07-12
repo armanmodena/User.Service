@@ -73,7 +73,7 @@ namespace User.Service
             app.Use(async (context, next) =>
             {
                 string securityCode = context.Request.Headers["Security-Code"];
-                if (Configuration.GetConnectionString("SecurityCode") == securityCode)
+                if (Configuration["SecurityCode"] == securityCode)
                 {
                     await next.Invoke();
                 }

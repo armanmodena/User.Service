@@ -205,7 +205,31 @@ namespace User.Service.Controllers
                 }
             }
 
-            return null;
+            return BadRequest();
+        }
+
+
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> Delete(int id)
+        {
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    UserModel mUser = await UserService.Get(id);
+                    if (mUser is null)
+                        return HttpResponse(404, "User not found");
+
+                    var delete = await UserService.Delete(mUser);
+
+                    return HttpResponse(200, "Delete user successfully", mUser.AsUserNoPasswordDto());
+                }
+                catch (Exception ex)
+                {
+                    return ErrorResponse(ex);
+                }
+            }
+            return BadRequest();
         }
 
     }

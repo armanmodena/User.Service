@@ -7,5 +7,6 @@ namespace User.Service.Repositories.Interfaces
     {
         Task<UserToken> GetByUserId(int user_id);
         Task<UserToken> GetUserToken(int user_id, string refresh_token);
+        Task<UserToken> DeleteByUserId(int user_id);
     }
 }

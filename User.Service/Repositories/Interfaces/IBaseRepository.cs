@@ -6,7 +6,7 @@ namespace User.Service.Repositories.Interfaces
 {
     public interface IBaseRepository<T>
     {
-        Task<PageResult<T>> GetAll(string query, string select, Dictionary<string, string> filterFields, string[] globalSearchFields,
+        Task<PageResultDto<T>> GetAll(string query, string select, Dictionary<string, string> filterFields, string[] globalSearchFields,
             string search, string filterAnd, string filterOr, string filterOut, string orderBy, string direction, int page, int pageSize);
 
         Task<T> Get(int id);

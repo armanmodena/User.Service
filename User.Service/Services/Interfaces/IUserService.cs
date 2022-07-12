@@ -7,7 +7,7 @@ namespace User.Service.Services.Interfaces
 {
     public interface IUserService
     {
-        Task<PageResult<UserDto>> GetAll(string select, string search, string filterAnd, string filterOr, string filterOut, string orderBy, string direction, int page, int pageSize);
+        Task<PageResultDto<UserDto>> GetAll(string select, string search, string filterAnd, string filterOr, string filterOut, string orderBy, string direction, int page, int pageSize);
 
         Task<UserModel> Get(int id);
 

@@ -19,7 +19,7 @@ namespace User.Service.Repositories
 
         }
 
-        public Task<PageResult<UserDto>> GetAllUser(string query, string select, Dictionary<string, string> filterFields, string[] globalSearchFields,
+        public Task<PageResultDto<UserDto>> GetAllUser(string query, string select, Dictionary<string, string> filterFields, string[] globalSearchFields,
            string search, string filterAnd, string filterOr, string filterOut, string orderBy, string direction, int page, int pageSize)
         {
             var pagination = new Pagination();
@@ -31,7 +31,7 @@ namespace User.Service.Repositories
 
             var data = DB.Query<UserDto>(genQuery[1]).ToList();
 
-            var result = new PageResult<UserDto>() { Data = data, Page = page, PageSize = pageSize, TotalCount = totalCount.total, TotalPage = totalPage };
+            var result = new PageResultDto<UserDto>() { Data = data, Page = page, PageSize = pageSize, TotalCount = totalCount.total, TotalPage = totalPage };
             return Task.FromResult(result);
 
         }

@@ -20,7 +20,7 @@ namespace User.Service.Repositories
             DB = context.DB;
         }
 
-        public Task<PageResult<T>> GetAll(string query, string select, Dictionary<string, string> filterFields, string[] globalSearchFields,
+        public Task<PageResultDto<T>> GetAll(string query, string select, Dictionary<string, string> filterFields, string[] globalSearchFields,
            string search, string filterAnd, string filterOr, string filterOut, string orderBy, string direction, int page, int pageSize)
         {
             var pagination = new Pagination();
@@ -32,7 +32,7 @@ namespace User.Service.Repositories
 
             var data = DB.Query<T>(genQuery[1]).ToList();
 
-            var result = new PageResult<T>() { Data = data, Page = page, PageSize = pageSize, TotalCount = totalCount.total, TotalPage = totalPage };
+            var result = new PageResultDto<T>() { Data = data, Page = page, PageSize = pageSize, TotalCount = totalCount.total, TotalPage = totalPage };
             return Task.FromResult(result);
 
         }
