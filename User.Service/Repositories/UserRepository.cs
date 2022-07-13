@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using Dapper;
 using User.Service.DBContext;
@@ -19,22 +18,47 @@ namespace User.Service.Repositories
 
         }
 
-        public Task<PageResultDto<UserDto>> GetAllUser(string query, string select, Dictionary<string, string> filterFields, string[] globalSearchFields,
+        public async Task<(PageResultDto<UserDto>, ErrorDto)> GetAllUser(string query, string select, string[] fields, Dictionary<string, string> filterFields, string[] globalSearchFields,
            string search, string filterAnd, string filterOr, string filterOut, string orderBy, string direction, int page, int pageSize)
         {
             var pagination = new Pagination();
 
-            var genQuery = pagination.genQuery(query, select, filterFields, globalSearchFields, search, filterAnd, filterOut, filterOr, orderBy, direction, page, pageSize);
+            var error = pagination.validation(select, fields, filterFields, filterAnd, filterOr, filterOut);
+            if (error != null)
+                return (null, error);
 
-            var totalCount = DB.Query(genQuery[0]).FirstOrDefault();
+            var genQuery = pagination.genQuery(query, select, fields, filterFields, globalSearchFields, search, filterAnd, filterOut, filterOr, orderBy, direction, page, pageSize);
+
+            var totalCount = await DB.QueryFirstOrDefaultAsync(genQuery[0]);
             var totalPage = (int)Math.Ceiling((decimal)totalCount.total / pageSize);
 
-            var data = DB.Query<UserDto>(genQuery[1]).ToList();
+            var data = await DB.QueryAsync<UserDto>(genQuery[1]);
 
             var result = new PageResultDto<UserDto>() { Data = data, Page = page, PageSize = pageSize, TotalCount = totalCount.total, TotalPage = totalPage };
-            return Task.FromResult(result);
+            return (result, null);
 
         }
+
+        public async Task<(PageResultDto<UserWithTokenDto>, ErrorDto)> GetAllUserWithToken(string query, string select, string[] fields, Dictionary<string, string> filterFields, string[] globalSearchFields,
+           string search, string filterAnd, string filterOr, string filterOut, string orderBy, string direction, int page, int pageSize)
+        {
+            var pagination = new Pagination();
+
+            var error = pagination.validation(select, fields, filterFields, filterAnd, filterOr, filterOut);
+            if (error != null)
+                return (null, error);
+
+            var genQuery = pagination.genQuery(query, select, fields, filterFields, globalSearchFields, search, filterAnd, filterOut, filterOr, orderBy, direction, page, pageSize);
+
+            var totalCount = await DB.QueryFirstOrDefaultAsync(genQuery[0]);
+            var totalPage = (int)Math.Ceiling((decimal)totalCount.total / pageSize);
+
+            var data = await DB.QueryAsync<UserWithTokenDto>(genQuery[1]);
+
+            var result = new PageResultDto<UserWithTokenDto>() { Data = data, Page = page, PageSize = pageSize, TotalCount = totalCount.total, TotalPage = totalPage };
+            return (result, null);
+        }
+
 
         public Task<UserModel> GetByUsername(string username)
         {

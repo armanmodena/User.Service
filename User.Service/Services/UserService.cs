@@ -22,20 +22,43 @@ namespace User.Service.Services
             UserTokenRepository = userTokenRepository;
         }
 
-        public Task<PageResultDto<UserDto>> GetAll(string select, string search, string filterAnd, string filterOr, string filterOut, string orderBy, string direction, int page, int pageSize)
+        public Task<(PageResultDto<UserDto>, ErrorDto)> GetAll(string select, string search, string filterAnd, string filterOr, string filterOut, string orderBy, string direction, int page, int pageSize)
         {
-            Dictionary<string, string> filterFields = new Dictionary<string, string>()
-            {
-                {"id", "id"},
-                {"name", "name"},
-                {"username", "username"}
-            };
-
+            string[] fields = { "id", "name", "username" , "created_at", "updated_at", "image_name"};
             string[] globalSearchFields = { "name", "username" };
 
-            var query = @"select #select# from users #condition# #order# #direction# #perpage# #offset#";
+            Dictionary<string, string> filterFields = new Dictionary<string, string>()
+            {
+                {"id", "a.id"},
+                {"name", "a.name"},
+                {"username", "a.username"}
+            };
 
-            return UserRepository.GetAllUser(query, select, filterFields, globalSearchFields, search, filterAnd, filterOr, filterOut, orderBy, direction, page, pageSize);
+            var query = @"select #select# from users #condition# #order# #direction# #perpage# #offset#";
+            return UserRepository.GetAllUser(query, select, fields, filterFields, globalSearchFields, search, filterAnd, filterOr, filterOut, orderBy, direction, page, pageSize);
+        }
+
+        public Task<(PageResultDto<UserWithTokenDto>, ErrorDto)> GetAllWithToken(string select, string search, string filterAnd, string filterOr, string filterOut, string orderBy, string direction, int page, int pageSize)
+        {
+            string[] fields = { "id", "name", "username", "created_at", "updated_at", "image_name" };
+            string[] globalSearchFields = { "name", "username" };
+
+            Dictionary<string, string> filterFields = new Dictionary<string, string>()
+            {
+                {"id", "a.id"},
+                {"name", "a.name"},
+                {"username", "a.username"},
+                {"refresh_token", "b.refresh_token"}
+            };
+
+            var query = @"select #select# from(select a.id, a.name, a.username, a.created_at, a.updated_at, a.image_name, b.refresh_token 
+                            from users a
+                            left join user_token b on b.user_id = a.id
+                            #condition#
+                        ) as foo
+                        #where# #order# #direction# #perpage# #offset#";
+
+            return UserRepository.GetAllUserWithToken(query, select, fields, filterFields, globalSearchFields, search, filterAnd, filterOr, filterOut, orderBy, direction, page, pageSize);
         }
 
         public async Task<UserModel> Get(int id)
@@ -64,10 +87,12 @@ namespace User.Service.Services
         public Task<int> Delete(UserModel user)
         {
             var deleteUser = UserRepository.Delete(user);
+
             if(deleteUser != null)
             {
                 UserTokenRepository.DeleteByUserId(user.Id);
             }
+
             return deleteUser;
         }
 

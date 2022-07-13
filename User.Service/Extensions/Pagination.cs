@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections;
+using System.Linq;
+using User.Service.DTO;
 
 namespace User.Service.Extensions
 {
@@ -22,15 +24,27 @@ namespace User.Service.Extensions
                         .Replace("#offset#", "");
         }
 
-        public string setQuery(string query, string select, string condition, string orderBy, string direction, int pageSize, int offset, string where)
+        public string setQuery(string query, string select, string[] fields, string condition, string where, 
+            string orderBy, string direction, int pageSize, int offset)
         {
-            return query.Replace("#select#", !String.IsNullOrEmpty(select) ? select : "*")
+            string selectFields = "*";
+
+            if(select != null)
+            {
+                selectFields = select;
+            }
+            else if(fields != null)
+            {
+                selectFields = string.Join(",", fields);
+            }
+
+            return query.Replace("#select#", selectFields)
                         .Replace("#condition#", condition)
-                        .Replace("#order#", "order by " + orderBy)
+                        .Replace("#order#", $"order by {orderBy}")
                         .Replace("#direction#", direction)
                         .Replace("#where#", where)
-                        .Replace("#perpage#", "limit " + pageSize)
-                        .Replace("#offset#", "offset " + offset);
+                        .Replace("#perpage#", $"limit {pageSize}")
+                        .Replace("#offset#", $"offset {offset}");
         }
 
         public string setSearch(string[] globalSearch, string search)
@@ -45,15 +59,15 @@ namespace User.Service.Extensions
             {
                 if (count == 0)
                 {
-                    query = " LOWER(" + item + ") like '%" + search.ToLower() + "%'";
+                    query = $" LOWER({item}) like '%{search.ToLower()}%'";
                 }
                 else
                 {
-                    query = " or LOWER(" + item + ") like '%" + search.ToLower() + "%'";
+                    query = $" or LOWER({item}) like '%{search.ToLower()}%'";
                 }
             }
 
-            return "where (" + query + ")";
+            return $"where ({query})";
         }
 
         public string setFilterAnd(string prevCondition, IDictionary filterFields, string filterAnd)
@@ -79,22 +93,22 @@ namespace User.Service.Extensions
                         {
                             if (isNumeric(value[1]))
                             {
-                                newCondition += "where " + filterFields[value[0]] + " = " + value[1];
+                                newCondition += $"where {filterFields[value[0]]} = {value[1]}";
                             }
                             else
                             {
-                                newCondition += "where LOWER(" + filterFields[value[0]] + ") = '" + value[1].ToLower() + "'";
+                                newCondition += $"where LOWER({filterFields[value[0]]}) = '{value[1].ToLower()}'";
                             }
                         }
                         else
                         {
                             if (isNumeric(value[1]))
                             {
-                                newCondition += " and " + filterFields[value[0]] + " = " + value[1];
+                                newCondition += $" and {filterFields[value[0]]} = {value[1]}";
                             }
                             else
                             {
-                                newCondition += " and LOWER(" + filterFields[value[0]] + ") = '" + value[1].ToLower() + "'";
+                                newCondition += $" and LOWER({filterFields[value[0]]}) = '{value[1].ToLower()}'";
                             }
                         }
                         count++;
@@ -130,22 +144,22 @@ namespace User.Service.Extensions
                         {
                             if (isNumeric(value[1]))
                             {
-                                newCondition += "where " + filterFields[value[0]] + " = " + value[1];
+                                newCondition += $"where {filterFields[value[0]]} = {value[1]}";
                             }
                             else
                             {
-                                newCondition += "where LOWER(" + filterFields[value[0]] + ") = '" + value[1].ToLower() + "'";
+                                newCondition += $"where LOWER({filterFields[value[0]]}) = '{value[1].ToLower()}'";
                             }
                         }
                         else
                         {
                             if (isNumeric(value[1]))
                             {
-                                newCondition += " or " + filterFields[value[0]] + " = " + value[1];
+                                newCondition += $" or {filterFields[value[0]]} = {value[1]}";
                             }
                             else
                             {
-                                newCondition += " or LOWER(" + filterFields[value[0]] + ") = '" + value[1].ToLower() + "'";
+                                newCondition += $" or LOWER({filterFields[value[0]]}) = '{value[1].ToLower()}'";
                             }
                         }
                         count++;
@@ -158,7 +172,7 @@ namespace User.Service.Extensions
             return prevCondition;
         }
 
-        public string setFilterOut(string fields, string filterOut)
+        public string setFilterOut(string select, string[]  fields, string filterOut)
         {
             if (String.IsNullOrEmpty(filterOut))
                 return "";
@@ -175,28 +189,28 @@ namespace User.Service.Extensions
                 string[] value = f.Split(":");
                 if (value.Length == 2 && value[1] != null)
                 {
-                    if (fields.Contains(value[0]))
+                    if ((select != null && select.Contains(value[0])) || fields.Any(value[0].Contains))
                     {
                         if (count == 0)
                         {
                             if (isNumeric(value[1]))
                             {
-                                where += "where " + value[0] + " = " + value[1];
+                                where += $"where foo.{value[0]} = {value[1]}";
                             }
                             else
                             {
-                                where += "where LOWER(" + value[0] + ") = '" + value[1].ToLower() + "'";
+                                where += $"where LOWER(foo.{value[0]}) = '{value[1].ToLower()}'";
                             }
                         }
                         else
                         {
                             if (isNumeric(value[1]))
                             {
-                                where += " or " + value[0] + " = " + value[1];
+                                where += $" or foo.{value[0]} = {value[1]}";
                             }
                             else
                             {
-                                where += " or LOWER(" + value[0] + ") = '" + value[1].ToLower() + "'";
+                                where += $" or LOWER(foo.{value[0]}) = '{value[1].ToLower()}'";
                             }
                         }
                         count++;
@@ -207,7 +221,80 @@ namespace User.Service.Extensions
             return where;
         }
 
-        public string[] genQuery(string query, string select, IDictionary filterFields, string[] globalSearchFields, string search,
+        public ErrorDto validation(string select, string[] fields, IDictionary filterFields, string filterAnd, string filterOr, string filterOut)
+        {
+            if(select != null)
+            {
+                var selectArray = select.Split(",");
+                foreach (var sa in selectArray)
+                {
+                    if (!fields.Any(sa.Contains))
+                    {
+                        return new ErrorDto()
+                        {
+                            code = "422",
+                            message = $"Unknown field {sa} on select field"
+                        };
+                    }
+                }
+            }
+
+            if(filterAnd != null)
+            {
+                var filters = filterAnd.Split(",");
+                foreach (var fa in filters)
+                {
+                    string[] value = fa.Split(":");
+                    if (filterFields[value[0]] is null)
+                    {
+                        return new ErrorDto()
+                        {
+                            code = "422",
+                            message = $"Unknown field {fa} on filterAnd"
+                        };
+                    }
+                }
+            }
+
+            if (filterOr != null)
+            {
+                var filters = filterOr.Split(",");
+                foreach (var fo in filters)
+                {
+                    string[] value = fo.Split(":");
+                    if (filterFields[value[0]] is null)
+                    {
+                        return new ErrorDto()
+                        {
+                            code = "422",
+                            message = $"Unknown field {fo} on filterOr"
+                        };
+                    }
+                }
+            }
+
+            if (filterOut != null)
+            {
+                var filters = filterOut.Split(",");
+                foreach (var ft in filters)
+                {
+                    string[] value = ft.Split(":");
+                    if (!fields.Any(value[0].Contains))
+                    {
+                        return new ErrorDto()
+                        {
+                            code = "422",
+                            message = $"Unknown field {value[0]} on filterOut"
+                        };
+                    }
+                }
+            }
+
+            return null;
+        }
+
+
+        public string[] genQuery(string query, string select, string[] fields, IDictionary filterFields, string[] globalSearchFields, string search,
             string filterAnd, string filterOut, string filterOr, string orderBy, string direction, int page, int pageSize)
         {
             var condition = "";
@@ -215,13 +302,13 @@ namespace User.Service.Extensions
             condition = setFilterAnd(condition, filterFields, filterAnd);
             condition = setFilterOr(condition, filterFields, filterOr);
 
-            var where = setFilterOut(select, filterOut);
+            var where = setFilterOut(select, fields, filterOut);
 
             var countQuery = setCountQuery(query, condition);
 
             int offset = (page - 1) * pageSize;
 
-            var executeQuery = setQuery(query, select, condition, orderBy, direction, pageSize, offset, where);
+            var executeQuery = setQuery(query, select, fields, condition, where, orderBy, direction, pageSize, offset);
 
             string[] result = { countQuery, executeQuery };
 

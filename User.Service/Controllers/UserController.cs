@@ -29,11 +29,19 @@ namespace User.Service.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAll([FromQuery] string select = "*", [FromQuery] string search = null, [FromQuery] string filterAnd = null, [FromQuery] string filterOr = null,
-            [FromQuery] string filterOut = null, [FromQuery] string order = "id", [FromQuery] string direction = "asc", [FromQuery] int page = 1, [FromQuery] int pageSize = 10)
+        public async Task<IActionResult> GetAll([FromQuery] string select, [FromQuery] string search, [FromQuery] string filterAnd, [FromQuery] string filterOr,
+            [FromQuery] string filterOut, [FromQuery] string order = "id", [FromQuery] string direction = "asc", [FromQuery] int page = 1, [FromQuery] int pageSize = 10)
         {
             var users = await UserService.GetAll(select, search, filterAnd, filterOr, filterOut, order, direction, page, pageSize);
-            return HttpResponse(200, users);
+            return users.Item1 != null ? HttpResponse(200, users.Item1) : HttpResponse(400, users.Item2.message);
+        }
+
+        [HttpGet("with-token")]
+        public async Task<IActionResult> GetAllWithToken([FromQuery] string select, [FromQuery] string search, [FromQuery] string filterAnd, [FromQuery] string filterOr,
+           [FromQuery] string filterOut, [FromQuery] string order = "id", [FromQuery] string direction = "asc", [FromQuery] int page = 1, [FromQuery] int pageSize = 10)
+        {
+            var users = await UserService.GetAllWithToken(select, search, filterAnd, filterOr, filterOut, order, direction, page, pageSize);
+            return users.Item1 != null ? HttpResponse(200, users.Item1) : HttpResponse(400, users.Item2.message);
         }
 
         [HttpGet("{id}")]
