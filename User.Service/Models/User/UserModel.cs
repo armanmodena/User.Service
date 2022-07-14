@@ -19,7 +19,7 @@ namespace User.Service.Models.User
         public string Username { get; set; }
 
         [Column("password")]
-        public string Password { get; set; }
+        public string? Password { get; set; }
 
         [Column("created_at")]
         public DateTime CreatedAt { get; set; }

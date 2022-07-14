@@ -16,6 +16,8 @@ namespace User.Service.DTO.User
         public string Username { get; set; }
 
         public string? Password { get; set; }
+
+        public string? ImageName { get; set; }
     }
 
     public class CreateUserValidator : AbstractValidator<CreateUserDto>
@@ -30,6 +32,8 @@ namespace User.Service.DTO.User
             DB = context.DB;
 
             RuleFor(item => item.Username)
+               .Must(CheckPassword)
+               .WithMessage("Password must be set for not modena email account")
                .Must(IsUniqueUsername)
                .WithMessage("Username must be unique")
                .Must(NotContainSpace)
@@ -44,6 +48,17 @@ namespace User.Service.DTO.User
         public bool NotContainSpace(string value)
         {
             return modelValidator.NotContainSpace(value);
+        }
+
+        public bool CheckPassword(CreateUserDto user, string value)
+        {
+            if(!user.Username.Contains("@modena.com") && string.IsNullOrEmpty(user.Password))
+            {
+                return false;
+            } else
+            {
+                return true;
+            }
         }
     }
 }

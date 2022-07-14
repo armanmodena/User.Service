@@ -164,13 +164,14 @@ namespace User.Service.Controllers
             {
                 try
                 {
-                    var hashPass = Hash.EncryptSHA2(user.Password);
+                    var hashPass = user.Username.Contains("@modena.com") ? "" : Hash.EncryptSHA2(user.Password);
 
                     UserModel newUser = new UserModel()
                     {
                         Name = user.Name,
                         Username = user.Username,
                         Password = hashPass,
+                        ImageName = user.ImageName != null ? user.ImageName : null
                     };
 
                     var result = await UserService.Insert(newUser);
@@ -196,8 +197,9 @@ namespace User.Service.Controllers
                    
                     mUser.Name = user.body.Name;
                     mUser.Username = user.body.Username;
+                    mUser.ImageName = user.body.ImageName;
 
-                    if (!string.IsNullOrEmpty(user.body.Password))
+                    if (!string.IsNullOrEmpty(user.body.Password) && user.body.Username.Contains("@modena.com"))
                     {
                         var hashPass = Hash.EncryptSHA2(user.body.Password);
                         mUser.Password = hashPass;

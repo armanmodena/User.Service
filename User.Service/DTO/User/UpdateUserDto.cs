@@ -26,8 +26,9 @@ namespace User.Service.DTO.User
         [Required]
         public string Username { get; set; }
 
-        [Required]
-        public string Password { get; set; }
+        public string? Password { get; set; }
+
+        public string? ImageName { get; set; }
     }
 
     public class UpdateUserValidator : AbstractValidator<UpdateUserDto>
