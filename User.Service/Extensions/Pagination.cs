@@ -1,13 +1,25 @@
 ﻿using System;
 using System.Collections;
+using System.Collections.Generic;
+using System.Data;
 using System.Linq;
+using System.Threading.Tasks;
+using Dapper;
+using User.Service.DBContext;
 using User.Service.DTO;
 
 namespace User.Service.Extensions
 {
     [Serializable]
-    public class Pagination
+    public class Pagination<T>
     {
+        public readonly IDbConnection DB = null;
+
+        public Pagination(IPGSQLContext context)
+        {
+            DB = context.DB;
+        }
+
         public static bool isNumeric(string s)
         {
             return int.TryParse(s, out int n);
@@ -313,6 +325,25 @@ namespace User.Service.Extensions
             string[] result = { countQuery, executeQuery };
 
             return result;
+        }
+
+        public async Task<(PageResultDto<T>, ErrorDto)> pagination(string query, string select, string[] fields, Dictionary<string, string> filterFields, string[] globalSearchFields,
+           string search, string filterAnd, string filterOr, string filterOut, string orderBy, string direction, int page, int pageSize)
+        {
+
+            var error = validation(select, fields, filterFields, filterAnd, filterOr, filterOut);
+            if (error != null)
+                return (null, error);
+
+            var setQuery = genQuery(query, select, fields, filterFields, globalSearchFields, search, filterAnd, filterOut, filterOr, orderBy, direction, page, pageSize);
+
+            var totalCount = await DB.QueryFirstOrDefaultAsync(setQuery[0]);
+            var totalPage = (int)Math.Ceiling((decimal)totalCount.total / pageSize);
+
+            var data = await DB.QueryAsync<T>(setQuery[1]);
+
+            var result = new PageResultDto<T>() { Data = data, Page = page, PageSize = pageSize, TotalCount = totalCount.total, TotalPage = totalPage };
+            return (result, error);
         }
     }
 }

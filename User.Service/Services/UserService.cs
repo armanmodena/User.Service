@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using User.Service.DTO;
 using User.Service.DTO.User;
+using User.Service.Extensions;
 using User.Service.Models.User;
 using User.Service.Repositories.Interfaces;
 using User.Service.Services.Interfaces;
@@ -40,7 +41,7 @@ namespace User.Service.Services
 
         public Task<(PageResultDto<UserWithTokenDto>, ErrorDto)> GetAllWithToken(string select, string search, string filterAnd, string filterOr, string filterOut, string orderBy, string direction, int page, int pageSize)
         {
-            string[] fields = { "id", "name", "username", "created_at", "updated_at", "image_name" };
+            string[] fields = { "id", "name", "username", "created_at", "updated_at", "image_name", "refresh_token" };
             string[] globalSearchFields = { "name", "username" };
 
             Dictionary<string, string> filterFields = new Dictionary<string, string>()
