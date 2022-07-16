@@ -12,5 +12,6 @@ namespace User.Service.Services.Interfaces
 
         Task<UserToken> Insert(UserToken userToken);
 
+        Task<int> Update(UserToken userToken);
     }
 }

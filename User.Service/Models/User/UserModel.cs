@@ -19,15 +19,18 @@ namespace User.Service.Models.User
         public string Username { get; set; }
 
         [Column("password")]
+        #nullable enable
         public string? Password { get; set; }
 
         [Column("created_at")]
         public DateTime CreatedAt { get; set; }
 
         [Column("updated_at")]
+        #nullable enable
         public DateTime? UpdatedAt { get; set; }
 
         [Column("image_name")]
+        #nullable enable
         public string? ImageName { get; set; }
 
     }

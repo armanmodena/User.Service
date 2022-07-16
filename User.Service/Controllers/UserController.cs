@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using User.Service.DTO.User;
@@ -109,6 +110,25 @@ namespace User.Service.Controllers
             return BadRequest();
         }
 
+        [HttpPut("{user_id}/token")]
+        public async Task<IActionResult> UpdateToken([FromBody] UserToken userToken)
+        {
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    var updateToken = await UserTokenService.Update(userToken);
+
+                    return HttpResponse(200, "Update token successfully", userToken);
+                }
+                catch (Exception ex)
+                {
+                    return ErrorResponse(ex);
+                }
+            }
+            return BadRequest();
+        }
+
         [HttpGet("{user_id}/token/{refresh_token}")]
         public async Task<IActionResult> GetUserToken(int user_id, string refresh_token)
         {
@@ -177,6 +197,24 @@ namespace User.Service.Controllers
                     var result = await UserService.Insert(newUser);
 
                     return HttpResponse(201, "Create user successfully", result.AsUserNoPasswordDto());
+                }
+                catch (Exception ex)
+                {
+                    return ErrorResponse(ex);
+                }
+            }
+            return BadRequest();
+        }
+
+        [HttpPost("import")]
+        public async Task<IActionResult> PostImport([FromBody] List<UserModel> users)
+        {
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    var result = await UserService.InsertMultiple(users);
+                    return HttpResponse(201, "Import user successfully");
                 }
                 catch (Exception ex)
                 {

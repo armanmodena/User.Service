@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using User.Service.DTO;
+using Z.Dapper.Plus;
 
 namespace User.Service.Repositories.Interfaces
 {
@@ -12,6 +13,8 @@ namespace User.Service.Repositories.Interfaces
         Task<T> Get(int id);
 
         Task<int?> Insert(T entity);
+
+        Task<DapperPlusActionSet<T>> InsertMultiple(List<T> entity);
 
         Task<int> Update(T entity);
 

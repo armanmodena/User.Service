@@ -7,9 +7,9 @@ namespace User.Service.Extensions.AsDtos.User
     [Serializable]
     public static class AsUserDto
     {
-        public static UserDto AsUserNoPasswordDto(this UserModel user)
+        public static UserModel AsUserNoPasswordDto(this UserModel user)
         {
-            return new UserDto
+            return new UserModel
             {
                 Id = user.Id,
                 Name = user.Name,

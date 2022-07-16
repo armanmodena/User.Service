@@ -15,15 +15,15 @@ namespace User.Service.DTO.User
         [Required]
         public string Username { get; set; }
 
-        public string? Password { get; set; }
+        public string Password { get; set; }
 
-        public string? ImageName { get; set; }
+        public string ImageName { get; set; }
     }
 
     public class CreateUserValidator : AbstractValidator<CreateUserDto>
     {
 
-        public readonly IDbConnection DB = null;
+        public readonly IDbConnection DB;
 
         public ModelValidator<UserModel> modelValidator = new ModelValidator<UserModel>();
 

@@ -10,6 +10,7 @@ namespace User.Service.DTO
         public string Message { get; set; }
 
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-        public object? Data { get; set; }
+
+        public object Data { get; set; }
     }
 }

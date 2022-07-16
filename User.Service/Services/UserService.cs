@@ -7,6 +7,7 @@ using User.Service.Extensions;
 using User.Service.Models.User;
 using User.Service.Repositories.Interfaces;
 using User.Service.Services.Interfaces;
+using Z.Dapper.Plus;
 
 namespace User.Service.Services
 {
@@ -77,6 +78,11 @@ namespace User.Service.Services
             user.CreatedAt = DateTime.Now;
             user.Id = await UserRepository.Insert(user) ?? 0;
             return user;
+        }
+
+        public async Task<DapperPlusActionSet<UserModel>> InsertMultiple(List<UserModel> users)
+        {
+            return await UserRepository.InsertMultiple(users);
         }
 
         public Task<int> Update(UserModel user)

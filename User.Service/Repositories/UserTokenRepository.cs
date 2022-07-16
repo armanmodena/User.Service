@@ -25,7 +25,7 @@ namespace User.Service.Repositories
         public async Task<UserToken> DeleteByUserId(int user_id)
         {
             return await DB.QueryFirstOrDefaultAsync<UserToken>("delete from user_token where user_id=@user_id", new { user_id });
-
         }
     }
 }
+

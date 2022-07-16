@@ -1,7 +1,9 @@
-﻿using System.Threading.Tasks;
+﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 using User.Service.DTO;
 using User.Service.DTO.User;
 using User.Service.Models.User;
+using Z.Dapper.Plus;
 
 namespace User.Service.Services.Interfaces
 {
@@ -18,6 +20,8 @@ namespace User.Service.Services.Interfaces
         Task<UserModel> GetByUsername(string username);
 
         Task<UserModel> Insert(UserModel user);
+
+        Task<DapperPlusActionSet<UserModel>> InsertMultiple(List<UserModel> users);
 
         Task<int> Update(UserModel user);
 

@@ -1,13 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
-using System.Linq;
 using System.Threading.Tasks;
 using Dapper;
 using User.Service.DBContext;
 using User.Service.DTO;
 using User.Service.Extensions;
 using User.Service.Repositories.Interfaces;
+using Z.Dapper.Plus;
 
 namespace User.Service.Repositories
 {
@@ -36,6 +36,11 @@ namespace User.Service.Repositories
         public Task<int?> Insert(T entity)
         {
             return DB.InsertAsync<T>(entity);
+        }
+
+        public Task<DapperPlusActionSet<T>> InsertMultiple(List<T> entity)
+        {
+            return Task.FromResult(DB.BulkInsert<T>(entity));
         }
 
         public Task<int> Update(T entity)

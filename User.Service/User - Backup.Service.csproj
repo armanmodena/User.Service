@@ -14,11 +14,11 @@
 
   <ItemGroup>
     <PackageReference Include="Dapper.SimpleCRUD" Version="2.3.0" />
+    <PackageReference Include="DapperPlus" Version="1.1.0.2" />
     <PackageReference Include="FluentValidation.AspNetCore" Version="11.1.2" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
     <PackageReference Include="Npgsql" Version="6.0.5" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="5.6.3" />
-    <PackageReference Include="Z.Dapper.Plus" Version="4.0.30" />
   </ItemGroup>
 
   <ItemGroup>

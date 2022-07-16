@@ -30,5 +30,10 @@ namespace User.Service.Services
             userToken.Id = await UserTokenRepository.Insert(userToken) ?? 0;
             return userToken;
         }
+
+        public async Task<int> Update(UserToken userToken)
+        {
+            return await UserTokenRepository.Update(userToken);
+        }
     }
 }
